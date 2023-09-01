@@ -1,4 +1,4 @@
-type = "http"
-port = 8080
-env = ".env"
+source = "main.py"
 entrypoint = "main"
+env = ".env"
+port = 8080

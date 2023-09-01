@@ -1,5 +1,8 @@
+import json
 from abc import abstractmethod
-from typing import Any, Tuple, Type
+from typing import Any, Tuple, Type, Union
+
+from requests import Response
 
 from ..exceptions import InvalidAttributeTypeError
 
@@ -37,12 +40,12 @@ class BaseFunctionTest:
             setattr(self, attr, self.get_class_attr(user_defined_test_class, attr))
 
     @staticmethod
-    def format_possible_types(types: Tuple) -> str:
+    def format_possible_types(types: list) -> str:
         """Turn a tuple of type names into a human-readable string."""
         number_types = len(types)
         output = ""
         for index, item in enumerate(types):
-            if index == number_types - 1:
+            if index == number_types - 1 and index != 0:
                 output += ' or '
             elif index != 0:
                 output += ', '
@@ -51,16 +54,39 @@ class BaseFunctionTest:
 
     def validate_attributes(self) -> None:
         """Check the validity of the attributes provided."""
-        for attr, expected_type in self.attributes.items():
+        for attr, expected_types in self.attributes.items():
             value = getattr(self, attr)
-            if value is not None and not isinstance(value, expected_type) and value not in expected_type:
-                error_message = f"In class {self.name}, attribute '{attr}' must be of type {self.format_possible_types(expected_type)}"
+            if (
+                value is not None
+                and not any(isinstance(value, expected_type) for expected_type in expected_types)
+                and value not in expected_types
+            ):
+                error_message = f"In class {self.name}, attribute '{attr}' must be of type {self.format_possible_types(expected_types)}"
                 raise InvalidAttributeTypeError(error_message)
 
     @abstractmethod
     def make_post_request(self, url: str) -> None:
         """Make a post request to the url provided. Save the response in self.response"""
         pass
+
+    @staticmethod
+    def extract_response_output(response: Response) -> Union[Type[Exception], dict, Any]:
+        """
+        Get the output from a Reponse object.
+        Return the Exception class as the output if the function crashed.
+        Otherwise, return a dict if the output was a json and a str in all other cases.
+        """
+        response_output = response.text
+        if response_output.startswith("500 Internal Server Error"):
+            response_output = Exception
+        else:
+            try:
+                response_output = response.json()
+            except json.JSONDecodeError:
+                pass
+        if isinstance(response_output, int):
+            response_output = str(response_output)
+        return response_output
 
     @abstractmethod
     def check_response_validity(self, error_logs: str) -> Tuple[str, str]:
