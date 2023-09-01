@@ -1,71 +1,39 @@
-from importlib import import_module
 from typing import Any, List, Union, Tuple, Type
 import requests
-from requests import Response
 from termcolor import colored, cprint
 import json
+from cloud_function_test.matching import partial_matching
+from .base_test import BaseFunctionTest
+import re
 
 
-class Test:
-    """
-    A Test class for handling various testing attributes.
-    """
-    ATTRIBUTES = {
-        "payload": (dict, list),
-        "headers": (dict),
-        "status_code": (int),
-        "output": (dict, list, str, Exception),
-        "display_output_success": (bool)
-    }
+class HttpFunctionTest(BaseFunctionTest):
+    """Class representing a test for an http-triggered function"""
 
-    def __init__(self, user_defined_test_class: Type) -> None:
-        """Initialize the Test object with attributes from a user-defined test class."""
-        self.name = user_defined_test_class.__name__
-        self.response = None
-        self.initialize_attributes(user_defined_test_class)
-        self.validate_attributes()
+    def __init__(self, *args) -> None:
+        super().__init__(*args)
 
-    @staticmethod
-    def get_class_attr(obj: Type, attr: str) -> Any:
-        """Get an attribute from a class if it exists, otherwise return None."""
-        return getattr(obj, attr) if hasattr(obj, attr) else None
-
-    def initialize_attributes(self, user_defined_test_class: Type) -> None:
-        """Initialize attributes on the Test instance based on those of the user-defined class."""
-        for attr, _ in self.ATTRIBUTES.items():
-            setattr(self, attr, self.get_class_attr(user_defined_test_class, attr))
-
-    @staticmethod
-    def format_possible_types(types: Tuple) -> str:
-        """Turn a tuple of type names into a human-readable string."""
-        number_types = len(types)
-        output = ""
-        for index, item in enumerate(types):
-            if index == number_types - 1:
-                output += ' or '
-            elif index != 0:
-                output += ', '
-            output += item.__name__
-        return output
-
-    def validate_attributes(self) -> None:
-        """Check the validity of the attributes provided."""
-        for attr, expected_type in self.ATTRIBUTES.items():
-            value = getattr(self, attr)
-            if value is not None and not isinstance(value, expected_type):
-                raise TypeError(f"Attribute {attr} must be of type {self.format_possible_types(expected_type)}")
+    @property
+    def attributes(self) -> dict:
+        return {
+            "payload": (dict, list, str),
+            "headers": (dict),
+            "status_code": (int),
+            "output": (dict, list, str, re.Pattern, Exception),
+            "display_output_success": (bool)
+        }
 
     def make_post_request(self, url: str) -> None:
         """
         Make a post request to the url provided with self.headers and the self.payload as parameters.
         Save the response in self.response
         """
-        headers = self.headers if self.headers else {}
-        self.response = requests.post(
-            url,
-            headers=headers,
-            json=self.payload
-        )
+        params = {'url': url}
+        if self.headers:
+            params['headers'] = self.headers
+        if self.payload:
+            params['json'] = self.payload
+        self.response = requests.post(**params)
 
     @staticmethod
     def extract_response_output(response: requests.Response) -> Union[Exception, str, dict]:
@@ -82,8 +50,9 @@ class Test:
                 response_output = response.json()
             except json.JSONDecodeError:
                 pass
+        if isinstance(response_output, int):
+            response_output = str(response_output)
         return response_output
-
 
     def check_response_validity(self, error_logs: str) -> Tuple[str, str]:
         """
@@ -101,7 +70,7 @@ class Test:
         # assess general status (passed or failed)
         if (
             (self.status_code and self.status_code != response_status)
-            or (self.output and self.output != response_output)
+            or (self.output and not partial_matching(self.output, response_output))
             or (not self.output and response_output == Exception)
         ):
             status = "failed"
@@ -129,16 +98,3 @@ class Test:
             display_message.append(f"{response_output}")           
 
         return (status, "\n".join(display_message))      
-
-
-def import_tests(module_name: str) -> List[Test]:
-    """Import user-defined test classes from a module and create Test instances."""
-    module = import_module(module_name)
-    user_defined_test_classes = [
-        obj for _, obj
-        in module.__dict__.items()
-        if isinstance(obj, type)
-    ]
-    if not user_defined_test_classes:
-        raise Exception(f"No class is defined in your {module_name}.py file")
-    return [Test(cls) for cls in user_defined_test_classes]
