@@ -98,31 +98,3 @@ def is_instance_of_type(value: Any, type_hint: Any) -> bool:
 
     # cases not treated
     return False
-
-
-
-
-
-# Examples
-#print(is_instance_of_type(42, int))  # True
-#print(is_instance_of_type(42, Union[int, str]))  # True
-#print(is_instance_of_type("hello", Union[int, str]))  # True
-#print(is_instance_of_type([1, 2, 3], List[int]))  # True
-#print(is_instance_of_type(["1", "2"], List[int]))  # False
-#print(is_instance_of_type(["1", "2"], List[str]))  # True
-#print(is_instance_of_type(("a", 1), tuple[str, int]))  # True
-#print(partial_matching('a', 'a'))
-#print(partial_matching('a', 'b'))
-#print(partial_matching(['a'], ['a']))
-#print(partial_matching(['a'], ['a', 'b']))
-#print(partial_matching(['a', ...], ['a', 'b']))
-#print(partial_matching(['a', Ellipsis], ['b', 'a']))
-#print(partial_matching(['a', Ellipsis], ['b']))
-#print(partial_matching({'a': Ellipsis}, {'a': 1}))
-#print(partial_matching({'a': Ellipsis}, {'a': 1, 'b': 2}))
-#print(partial_matching({'a': 1}, {'a': 1, 'b': 2}))
-#print(partial_matching({'a': 1, ...:...}, {'a': 1, 'b': 2}))
-
-#print(partial_matching(list, [1, 2]))
-#print(partial_matching(Tuple[Any, Any], ("a", "b")))
-#print(partial_matching(Union[int, str], 1))
