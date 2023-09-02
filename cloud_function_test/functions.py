@@ -32,14 +32,14 @@ def import_user_classes(module_name: str) -> list:
             "by settings the value of cloud_function_test.module or by using the --module argument in the cli."
         )
         raise ModuleNotFoundError(error_message)
-    user_defined_test_classes = [
+    user_defined_classes = [
         obj for _, obj
         in module.__dict__.items()
         if isinstance(obj, type)
     ]
-    if not user_defined_test_classes:
+    if not user_defined_classes:
         raise MissingTestClassError(f"No class is defined in your module {module_name}")
-    return user_defined_test_classes
+    return user_defined_classes
 
 
 def create_tests(user_defined_classes: List[object]) -> Tuple[List[BaseFunctionTest], Type[BaseFunctionTest]]:

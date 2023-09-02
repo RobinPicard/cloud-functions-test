@@ -1,4 +1,5 @@
 functions-framework
 pytest
+python-dotenv
 requests
 termcolor

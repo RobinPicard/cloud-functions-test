@@ -1,8 +1,8 @@
 import pytest
 
 from cloud_function_test.functions import create_tests
-from cloud_function_test.functions import EventFunctionTest
-from cloud_function_test.functions import HttpFunctionTest
+from cloud_function_test.test_classes.event_test import EventFunctionTest
+from cloud_function_test.test_classes.http_test import HttpFunctionTest
 
 
 def test_create_tests():
