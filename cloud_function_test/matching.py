@@ -1,5 +1,10 @@
 import re
-from typing import List, Union, Type, Any, Tuple, _SpecialForm
+from typing import Any
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import List
+from typing import _SpecialForm
 
 
 def partial_matching(expected: Any, actual: Any) -> bool:
@@ -84,7 +89,17 @@ def is_instance_of_type(value: Any, type_hint: Any) -> bool:
         element_type = type_hint.__args__[0]
         return all(is_instance_of_type(element, element_type) for element in value)
 
-    # in case type_hint = tuple
+    # in case type_hint = Dict
+    if hasattr(type_hint, '__origin__') and type_hint.__origin__ is dict:
+        if not isinstance(value, dict):
+            return False
+        key_type, value_type = type_hint.__args__
+        return all(
+            is_instance_of_type(k, key_type) and is_instance_of_type(v, value_type)
+            for k, v in value.items()
+        )
+
+    # in case type_hint = Tuple
     if hasattr(type_hint, '__origin__') and type_hint.__origin__ is tuple:
         if not isinstance(value, tuple):
             return False

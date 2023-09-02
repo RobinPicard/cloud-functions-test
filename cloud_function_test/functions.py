@@ -9,9 +9,9 @@ from typing import List, Tuple, Type
 
 from requests import ConnectionError
 
+from .exceptions import DifferentClassTypesError
 from .exceptions import MissingTestClassError
 from .exceptions import PortUnavailableError
-from .exceptions import DifferentClassTypesError
 from .test_classes.base_test import BaseFunctionTest
 from .test_classes.event_test import EventFunctionTest
 from .test_classes.http_test import HttpFunctionTest
@@ -122,8 +122,8 @@ def run_tests(process: object, local_url: str, tests: Type[BaseFunctionTest]) ->
                 "(main by default) matches the name of your function."
             )
             raise Exception(error_message)
-        error_logs = log_reader(process.stderr)
-        validity_result = test.check_response_validity(error_logs)
+        error_logs, standard_logs = log_reader(process)
+        validity_result = test.check_response_validity(error_logs, standard_logs)
         results.append(validity_result)
     failures = [item[1] for item in results if item[0] == 'failed']
     successes = [item[1] for item in results if item[0] == 'passed']
@@ -137,8 +137,8 @@ def display_detailed_results(failures: list, successes: list) -> None:
         print_centered_text("FAILED")
         for result in failures:
             print(result)
-    if successes:
-        if any(result for result in successes):
-            print_centered_text("PASSED")
-            for result in successes:
+    if any(result for result in successes):
+        print_centered_text("PASSED")
+        for result in successes:
+            if result:
                 print(result)

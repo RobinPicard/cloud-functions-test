@@ -1,7 +1,7 @@
 import pytest
 
-from cloud_function_test.environment import parse_terraform_env_str
 from cloud_function_test.exceptions import InvalidTerraformFileError
+from cloud_function_test.environment import parse_terraform_env_str
 
 
 def test_parse_terraform_env_str():

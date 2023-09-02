@@ -21,13 +21,15 @@ class BaseFunctionTest:
         self.validate_attributes()
 
     @property
-    @abstractmethod
     def attributes(self) -> dict:
         """
         Dict containing as keys each possible input attributes of the user-defined class for the given test type
         and as values the associated possible types for the attribute
         """
-        pass
+        return {
+            "error": [bool],
+            "display_logs": [bool]
+        }
 
     @staticmethod
     def get_class_attr(obj: Type, attr: str) -> Any:
@@ -89,7 +91,7 @@ class BaseFunctionTest:
         return response_output
 
     @abstractmethod
-    def check_response_validity(self, error_logs: str) -> Tuple[str, str]:
+    def check_response_validity(self, error_logs: str, standard_logs: str) -> Tuple[str, str]:
         """
         Check the validity of the request's response compared to the expected values.
         Return the status of the test and the detailed message that should be printed out

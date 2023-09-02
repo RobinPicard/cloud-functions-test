@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 name = "cloud-function-test"
@@ -13,8 +13,9 @@ setup(
     author='Robin Picard',
     author_email='robin.picard@sciencespo.fr'
     install_requires=[
+        'functions-framework',
         'requests',
-        'termcolor'
+        'termcolor',
     ],
     entry_points={
         'console_scripts': [
