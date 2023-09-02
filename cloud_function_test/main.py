@@ -1,16 +1,15 @@
 import subprocess
 import tempfile
-import time
 
 import requests
 
 from .environment import setup_environment
-from .functions import display_detailed_results
+from .functions import create_temp_file_event
 from .functions import create_tests
+from .functions import display_detailed_results
 from .functions import import_user_classes
 from .functions import run_tests
 from .functions import start_server
-from .functions import create_temp_file_event
 from .utils import print_centered_text
 from .utils import set_fd_nonblocking
 from .test_classes.event_test import EventFunctionTest
@@ -56,6 +55,7 @@ def main(cli_test_module: str, cli_source: str, cli_entrypoint: str, cli_env: st
 
     try:
         set_fd_nonblocking(process.stderr.fileno())
+        set_fd_nonblocking(process.stdout.fileno())
         failures, successes = run_tests(process, local_url, tests)
         display_detailed_results(failures, successes)
     finally:

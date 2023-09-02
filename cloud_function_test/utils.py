@@ -1,18 +1,34 @@
 import fcntl
 import os
 from math import floor
+from typing import Tuple
 
 
-def log_reader(all_logs: object) -> str:
-    """Read all available logs and return them in a string"""
-    new_logs = []
+def log_reader(process: object) -> Tuple[str, str]:
+    """Read all available logs and return them in a tuple(error, standard)"""
+    standard_logs = []
+    error_logs = []
     while True:
-        line = all_logs.readline()
+        line = process.stdout.readline()
         if line:
             new_logs.append(line.decode('utf-8'))
         else:
             break
-    return "".join(new_logs).strip('\n')
+    while True:
+        line = process.stderr.readline()
+        if line:
+            line = line.decode('utf-8')
+            # logging.error/warning are added to stderr but we want to treat them as standard logs
+            if line.startswith('ERROR:') or line.startswith('WARNING:'):
+                standard_logs.append(line)
+            else:
+                error_logs.append(line)
+        else:
+            break
+    return(
+        "".join(error_logs).strip('\n'),
+        "".join(standard_logs).strip('\n')
+    )
 
 
 def set_fd_nonblocking(fd: object) -> None:

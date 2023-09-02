@@ -1,5 +1,6 @@
 import argparse
 import sys
+
 from .main import main as entrypoint_main
 
 

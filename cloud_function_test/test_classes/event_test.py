@@ -16,10 +16,17 @@ class EventFunctionTest(BaseFunctionTest):
 
     @property
     def attributes(self) -> dict:
-        return {
+        """
+        Dict containing as keys each possible input attributes of the user-defined class for the given test type
+        and as values the associated possible types for the attribute
+        """
+        attr = {
             "event": [dict],
             "context": [dict],
-            "error": [bool],
+        }
+        return {
+            **super().attributes,
+            **attr
         }
 
     def make_post_request(self, url: str) -> None:
@@ -37,7 +44,7 @@ class EventFunctionTest(BaseFunctionTest):
             params['json'] = data
         self.response = requests.post(**params)
 
-    def check_response_validity(self, error_logs: str) -> Tuple[str, str]:
+    def check_response_validity(self, error_logs: str, standard_logs: str) -> Tuple[str, str]:
         """
         Check whether the function created error logs and compare it to the value of self.error
         Print out whether the test passed or failed and returns the detailled logs in case of failure.
@@ -53,6 +60,8 @@ class EventFunctionTest(BaseFunctionTest):
             status = "failed"
             print(f"test {self.name} in {response_time}s: ", colored("FAILED", 'red'))
             display_message.append(colored(f"test {self.name}", "cyan"))
+            if standard_logs:
+                display_message.append(f"{standard_logs}")
             if error_logs:
                 display_message.append(f"Function crashed")
                 display_message.append(f"{error_logs}")
@@ -60,5 +69,7 @@ class EventFunctionTest(BaseFunctionTest):
                 display_message.append(f"Function did not crash while an error was expected")
         else:
             print(f"test {self.name} in {response_time}s: ", colored("PASSED", 'green'))
-
+            if self.display_logs and standard_logs:
+                display_message.append(colored(f"test {self.name}", "cyan"))
+                display_message.append(f"{standard_logs}")
         return (status, "\n".join(display_message))

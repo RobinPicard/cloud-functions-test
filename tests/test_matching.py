@@ -1,9 +1,15 @@
 import re
-from typing import Any, Union, List, Tuple, _SpecialForm
+from typing import Any
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import List
+from typing import _SpecialForm
 
 import pytest
 
-from cloud_function_test.matching import is_instance_of_type, partial_matching
+from cloud_function_test.matching import is_instance_of_type
+from cloud_function_test.matching import partial_matching
 
 
 def test_partial_matching():
@@ -42,6 +48,8 @@ def test_partial_matching():
     assert partial_matching([1, {'a': Ellipsis, Ellipsis:Ellipsis}], [1, {'a': 1, 'b': 2}]) == True
     assert partial_matching({'a': [1, 2, Ellipsis]}, {'a': [1, 2, 3, 4]}) == True
     assert partial_matching(re.compile(r'^\d+$'), '123') == True
+    assert partial_matching(Tuple[dict, List[int]], ({"a": 1}, [1, 2])) == True
+    assert partial_matching(Tuple[dict, List[int]], ({"a": 1}, [1, "b"])) == False
 
 
 def test_is_instance_of_type():
@@ -54,23 +62,29 @@ def test_is_instance_of_type():
     assert is_instance_of_type([5], list) == True
     assert is_instance_of_type({"a": "b"}, dict) == True
     assert is_instance_of_type({"a"}, set) == True
-    # any
+    # Any
     assert is_instance_of_type(5, Any) == True
     assert is_instance_of_type("hello", Any) == True
     assert is_instance_of_type([1, 2, 3], Any) == True
-    # union
+    # Union
     assert is_instance_of_type(5, Union[int, str]) == True
     assert is_instance_of_type("hello", Union[int, str]) == True
     assert is_instance_of_type(5.5, Union[int, str]) == False
-    # list
+    # List
     assert is_instance_of_type([1, 2, 3], List[int]) == True
     assert is_instance_of_type([1, "hello"], List[int]) == False
     assert is_instance_of_type("hello", List[int]) == False
-    # tuple
+    # Dict
+    assert is_instance_of_type({"key": 1}, Dict[str, int])
+    assert not is_instance_of_type({1: "value"}, Dict[str, int])
+    assert not is_instance_of_type({"key": "value"}, Dict[str, int])
+    assert not is_instance_of_type("not_a_dict", Dict[str, int])
+    # Tuple
     assert is_instance_of_type((1, "hello"), Tuple[int, str]) == True
     assert is_instance_of_type((1, 2), Tuple[int, str]) == False
     assert is_instance_of_type([1, 2, "hello"], Tuple[int, int]) == False
-    # more complex
+    # mix of several things
     assert is_instance_of_type([1, 2, 3], Union[List[int], str]) == True
     assert is_instance_of_type((1, [2, 3]), Tuple[int, List[int]]) == True
     assert is_instance_of_type((1, [2, "hello"]), Tuple[int, List[int]]) == False
+    assert is_instance_of_type((1, {"a": [1, 2]}), Tuple[int, Dict[str, list]]) == True
