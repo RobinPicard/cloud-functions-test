@@ -16,8 +16,6 @@ def partial_matching(expected: Any, actual: Any) -> bool:
     Supports the use of types (either native or typing) in the expected object
     """
 
-    print("partial_matching", expected, actual)
-
     # in case of a type
     if (
         isinstance(expected, type)
@@ -75,7 +73,6 @@ def is_instance_of_type(value: Any, type_hint: Any) -> bool:
     The function is recursive to support more complex typing types (Union, List...)
     May not work for the most complex cases
     """
-    #print(value, type_hint)
 
     # in case type_hint is a basic type
     try:
