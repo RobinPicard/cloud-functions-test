@@ -28,8 +28,3 @@ class OopsUnintendedError:
     headers = {'Content-Type': 'application/json'}
     status_code = 200
     output = {"a": 1, "b": 2}
-
-
-
-
-
