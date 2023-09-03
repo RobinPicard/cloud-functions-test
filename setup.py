@@ -3,7 +3,12 @@ from setuptools import find_packages
 
 
 name = "cloud-functions-test"
-version = "0.0.6"
+version = "0.0.1"
+
+
+with open('README.md', 'r') as f:
+    long_description = f.read()
+
 
 setup(
     name=name,
@@ -14,6 +19,8 @@ setup(
     },
     license='apache-2.0',
     description="Test locally GCP Cloud Functions",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url=f"https://github.com/RobinPicard/{name}",
     download_url=f"https://github.com/RobinPicard/{name}/releases/download/v0.0.1/{name}-{version}.tar.gz",
     author='Robin Picard',
