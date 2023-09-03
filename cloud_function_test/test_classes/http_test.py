@@ -40,9 +40,9 @@ class HttpFunctionTest(BaseFunctionTest):
         Save the response in self.response
         """
         params = {'url': url}
-        if self.headers:
+        if self.headers is not None:
             params['headers'] = self.headers
-        if self.data:
+        if self.data is not None:
             params['json'] = self.data
         self.response = requests.post(**params)
 
