@@ -1,9 +1,10 @@
 import re
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Tuple
 from typing import Type
 from typing import Union
-from typing import List
 from typing import _SpecialForm
 
 import pytest
