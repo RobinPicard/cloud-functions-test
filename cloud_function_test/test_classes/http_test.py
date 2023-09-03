@@ -62,8 +62,8 @@ class HttpFunctionTest(BaseFunctionTest):
         # assess general status (passed or failed) regardless of the type of success/failure
         if (
             ((response_output == Exception) != (self.error or False))
-            or (self.status_code and self.status_code != response_status)
-            or (self.output and not partial_matching(self.output, response_output))
+            or (self.status_code is not None and self.status_code != response_status)
+            or (self.output is not None and not partial_matching(self.output, response_output))
         ):
             status = "failed"
             print(f"test {self.name} in {response_time}s: ", colored("FAILED", 'red'))
@@ -80,11 +80,11 @@ class HttpFunctionTest(BaseFunctionTest):
             display_message.append(f"Function did not crash while an error was expected")
             display_message.append(f"- received: {response_status}, {response_output}")
         else:
-            if self.status_code and self.status_code != response_status:
+            if self.status_code is not None and self.status_code != response_status:
                 display_message.append(f"Unexpected status code")
                 display_message.append(f"- expected: {self.status_code}")
                 display_message.append(f"- received: {response_status}")
-            if self.output and self.output != response_output:
+            if self.output is not None and self.output != response_output:
                 display_message.append(f"Unexpected output")
                 display_message.append(f"- expected: {self.output}")
                 display_message.append(f"- received: {response_output}")
