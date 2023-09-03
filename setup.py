@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 
 name = "cloud-functions-test"
-version = "0.0.1"
+version = "0.0.2"
 
 
 with open('README.md', 'r') as f:

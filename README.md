@@ -116,7 +116,7 @@ You can specify 4 additional attributes for those:
 
 It's quite common to want to check the validity of the output of an http-triggered Cloud Function without knowing the exact value of the expected output. This happens for instance if you Cloud Function is calling an external service or if your output includes an "updated_at" timestamp. In that case, you may want to test that the structure of the output is correct rather than the exact content.
 
-There are 2 types of wildcards your can use for that purpose:
+There are 3 types of wildcards your can use for that purpose:
 * Ellipsis
     * If you include this object in a list, the test will only check that the other elements of the list are found in the actual output
     ```
@@ -127,13 +127,13 @@ There are 2 types of wildcards your can use for that purpose:
     * If you pass this object as a key in a dict, the test will only check that all other key/value pairs are found in the actual output
     ```
     A:
-        output = {"a": 1, "b": Ellipsis}
+        output = {"a": 1, Ellipsis: Ellipsis}
     ```
     This will match with `actual_output = {"a": 1, "b": 2, "c": 3}`
 * Types
 
-    You can include both basic types (int, str...) and types from the typing package (Union, Tuple...) in the expected output.
-    * Rather simple case
+    You can include both basic/collection types (int, float, str, list, dict) and types from the typing package (Any, Union, List, Tuple, Dict) in the expected output.
+    * Simple case
         ```
         A:
             output = List[int]
@@ -142,11 +142,18 @@ There are 2 types of wildcards your can use for that purpose:
     * More complex example
         ```
         A:
-            output = Tuple[dict, List[int]]
+            output = Tuple[dict, List[int], Union[int, str]]
         ```
-        This will match with `actual_output = ({"a": 1}, [1, 2])`
-    
-    We cannot ensure you that the most complex cases are covered unfortunately
+        This will match with `actual_output = [{"a": 1}, [1, 2], "b"]`
+* Regex
+
+    You can include an object of type re.Pattern in your expected output. If the actual output is a string, it will be matched with the pattern.
+    ```
+    A:
+        output = ["a", re.compile(r'^\d+$')]
+    ```
+    This will match with `actual_output = ["a", "123a"]`
+
 
 ### Event-triggered Functions <a name="event-triggered-functions"></a>
 

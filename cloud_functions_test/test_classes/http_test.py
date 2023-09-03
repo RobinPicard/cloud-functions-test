@@ -84,7 +84,7 @@ class HttpFunctionTest(BaseFunctionTest):
                 display_message.append(f"Unexpected status code")
                 display_message.append(f"- expected: {self.status_code}")
                 display_message.append(f"- received: {response_status}")
-            if self.output is not None and self.output != response_output:
+            if self.output is not None and not partial_matching(self.output, response_output):
                 display_message.append(f"Unexpected output")
                 display_message.append(f"- expected: {self.output}")
                 display_message.append(f"- received: {response_output}")

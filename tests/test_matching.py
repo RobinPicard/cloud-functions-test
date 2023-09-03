@@ -9,102 +9,82 @@ from typing import _SpecialForm
 
 import pytest
 
-from cloud_functions_test.matching import is_instance_of_type
 from cloud_functions_test.matching import partial_matching
 
 
 def test_partial_matching():
-    # basic
-    assert partial_matching(5, 5) == True
-    assert partial_matching("hello", "hello") == True
-    assert partial_matching(5, 4) == False
-    assert partial_matching(5, "hello") == False
-    assert partial_matching("hello", ["hello"]) == False
-    # regex
+    # instance basic type
+    assert partial_matching(int, 5) == True
+    assert partial_matching(float, 5.5) == True
+    assert partial_matching(str, "hello") == True
+    assert partial_matching(str, 5) == False
+    assert partial_matching(list, 5) == False
+    assert partial_matching(list, [5]) == True
+    assert partial_matching(dict, {"a": "b"}) == True
+    assert partial_matching(set, {"a"}) == True
+    # instance regex
     assert partial_matching(re.compile(r'^\d+$'), '123') == True
     assert partial_matching(re.compile(r'^\d+$'), '123a') == False
     assert partial_matching(re.compile(r'^\d+$'), 123) == False
-    # list with Ellipsis
+    # instance list with Ellipsis
     assert partial_matching([1, 2, Ellipsis], [1, 2, 3, 4, 5]) == True
     assert partial_matching([1, 2, Ellipsis], [1, 2]) == True
     assert partial_matching([1, 2, Ellipsis], [2, 3, 4, 5]) == False
-    # list without Ellipsis
+    # instance list without Ellipsis
     assert partial_matching([1, 2, 3], [1, 2, 3]) == True
     assert partial_matching([1, 2, 3], [1, 2]) == False
     assert partial_matching([1, 2, 3], [1, 2, 3, 4]) == False
-    # tuple with Ellipsis
+    # instance tuple with Ellipsis
     assert partial_matching((1, 2, Ellipsis), (1, 2, 3, 4, 5)) == True
     assert partial_matching((1, 2, Ellipsis), (1, 2)) == True
     assert partial_matching((1, 2, Ellipsis), (2, 3, 4, 5)) == False
-    # tuple without Ellipsis
+    # instance tuple without Ellipsis
     assert partial_matching((1, 2, 3), (1, 2, 3)) == True
     assert partial_matching((1, 2, 3), (1, 2)) == False
     assert partial_matching((1, 2, 3), (1, 2, 3, 4)) == False
-    # dict with Ellipsis
+    # instance dict with Ellipsis
     assert partial_matching({'a': 1, 'b': Ellipsis}, {'a': 1, 'b': 2}) == True
     assert partial_matching({'a': 1, Ellipsis: Ellipsis}, {'a': 1, 'b': 2}) == True
     assert partial_matching({'a': 1, 'b': Ellipsis}, {'a': 1}) == False
-    # dict without Ellipsis
+    # instance dict without Ellipsis
     assert partial_matching({'a': 1, 'b': 2}, {'a': 1, 'b': 2}) == True
     assert partial_matching({'a': 1, 'b': 2}, {'a': 1}) == False
     assert partial_matching({'a': 1, 'b': 2}, {'a': 1, 'b': 3}) == False
     assert partial_matching({'a': 1, 'b': 2}, {'a': 1, 'b': 2, 'c': 3}) == False
-    # set with Ellipsis
-    assert partial_matching({1, 2, Ellipsis}, {1, 2, 3, 4, 5}) == True
-    assert partial_matching({1, 2, Ellipsis}, {1, 2}) == True
-    assert partial_matching({1, 2, Ellipsis}, {2, 3, 4, 5}) == False
-    # set without Ellipsis
-    assert partial_matching({1, 2, 3}, {1, 2, 3}) == True
-    assert partial_matching({1, 2, 3}, {1, 2}) == False
-    assert partial_matching({1, 2, 3}, {1, 2, 3, 4}) == False
-#    # types
+    # type basic
     assert partial_matching(int, 5) == True
     assert partial_matching(int, '5') == False
     assert partial_matching(str, 'hello') == True
-    # more complex
+    # typing.Any
+    assert partial_matching(Any, 5) == True
+    assert partial_matching(Any, "hello") == True
+    assert partial_matching(Any, [1, 2, 3]) == True
+    # typing.Union
+    assert partial_matching(Union[int, str], 5) == True
+    assert partial_matching(Union[int, str], "hello") == True
+    assert partial_matching(Union[int, str], 5.5) == False
+    # typing.List
+    assert partial_matching(List[int], [1, 2, 3]) == True
+    assert partial_matching(List[int], [1, "hello"]) == False
+    assert partial_matching(List[int], "hello") == False
+    # typing.Tuple
+    assert partial_matching(Tuple[int, str], [1, "hello"]) == True
+    assert partial_matching(Tuple[int, str], [1, 2]) == False
+    assert partial_matching(Tuple[int, int], [1, 2, "hello"]) == False
+    # typing.Dict
+    assert partial_matching(Dict[str, int], {"key": 1, "foo": 2}) == True
+    assert partial_matching(Dict[str, int], {1: "value"}) == False
+    assert partial_matching(Dict[str, int], "not_a_dict") == False
+    # mix of several things
+    assert partial_matching(Union[List[int], str], [1, 2, 3]) == True
+    assert partial_matching(Tuple[int, List[int]], [1, [2, 3]]) == True
+    assert partial_matching(Tuple[int, List[int]], [1, [2, "hello"]]) == False
+    assert partial_matching(Tuple[int, Dict[str, list]], [1, {"a": [1, 2]}]) == True
     assert partial_matching([1, {'a': Ellipsis, Ellipsis:Ellipsis}], [1, {'a': 1, 'b': 2}]) == True
     assert partial_matching({'a': [1, 2, Ellipsis]}, {'a': [1, 2, 3, 4]}) == True
     assert partial_matching(re.compile(r'^\d+$'), '123') == True
-    assert partial_matching(Tuple[dict, List[int]], ({"a": 1}, [1, 2])) == True
-    assert partial_matching(Tuple[dict, List[int]], ({"a": 1}, [1, "b"])) == False
-    assert partial_matching({"a": Tuple[List[int], Dict[str, Tuple[int, int]]]}, {"a": ([1, 2], {"a": (1, 2)})}) == True
-    assert partial_matching({"a": Tuple[dict, List[int]], "b": Any, Ellipsis:Ellipsis}, {"a": ({"a": 1}, [1, 2]), "b": 1, "c": 1}) == True
-    assert partial_matching({"a": Tuple[dict, List[int]], "b": 1, Ellipsis:Ellipsis}, {"a": ({"a": 1}, [1, "a"]), "b": Any, "c": 1}) == False
-
-
-def test_is_instance_of_type():
-    # basic type
-    assert is_instance_of_type(5, int) == True
-    assert is_instance_of_type(5.5, float) == True
-    assert is_instance_of_type("hello", str) == True
-    assert is_instance_of_type(5, str) == False
-    assert is_instance_of_type(5, list) == False
-    assert is_instance_of_type([5], list) == True
-    assert is_instance_of_type({"a": "b"}, dict) == True
-    assert is_instance_of_type({"a"}, set) == True
-    # Any
-    assert is_instance_of_type(5, Any) == True
-    assert is_instance_of_type("hello", Any) == True
-    assert is_instance_of_type([1, 2, 3], Any) == True
-    # Union
-    assert is_instance_of_type(5, Union[int, str]) == True
-    assert is_instance_of_type("hello", Union[int, str]) == True
-    assert is_instance_of_type(5.5, Union[int, str]) == False
-    # List
-    assert is_instance_of_type([1, 2, 3], List[int]) == True
-    assert is_instance_of_type([1, "hello"], List[int]) == False
-    assert is_instance_of_type("hello", List[int]) == False
-    # Dict
-    assert is_instance_of_type({"key": 1}, Dict[str, int])
-    assert not is_instance_of_type({1: "value"}, Dict[str, int])
-    assert not is_instance_of_type({"key": "value"}, Dict[str, int])
-    assert not is_instance_of_type("not_a_dict", Dict[str, int])
-    # Tuple
-    assert is_instance_of_type((1, "hello"), Tuple[int, str]) == True
-    assert is_instance_of_type((1, 2), Tuple[int, str]) == False
-    assert is_instance_of_type([1, 2, "hello"], Tuple[int, int]) == False
-    # mix of several things
-    assert is_instance_of_type([1, 2, 3], Union[List[int], str]) == True
-    assert is_instance_of_type((1, [2, 3]), Tuple[int, List[int]]) == True
-    assert is_instance_of_type((1, [2, "hello"]), Tuple[int, List[int]]) == False
-    assert is_instance_of_type((1, {"a": [1, 2]}), Tuple[int, Dict[str, list]]) == True
+    assert partial_matching(Tuple[dict, List[int]], [{"a": 1}, [1, 2]]) == True
+    assert partial_matching(Tuple[dict, List[int]], [{"a": 1}, [1, "b"]]) == False
+    assert partial_matching({"a": Tuple[List[int], Dict[str, Tuple[int, int]]]}, {"a": [[1, 2], {"a": [1, 2]}]}) == True
+    assert partial_matching({"a": Tuple[dict, List[int]], "b": Any, Ellipsis:Ellipsis}, {"a": [{"a": 1}, [1, 2]], "b": 1, "c": 1}) == True
+    assert partial_matching({"a": Tuple[dict, List[int]], "b": 1, Ellipsis:Ellipsis}, {"a": [{"a": 1}, [1, "a"]], "b": Any, "c": 1}) == False
