@@ -36,9 +36,9 @@ class EventFunctionTest(BaseFunctionTest):
         """
         params = {'url': url, 'headers': {'Content-Type': 'application/json'}}
         data = {}
-        if self.event:
+        if self.event is not None:
             data['event'] = self.event
-        if self.context:
+        if self.context is not None:
             data['context'] = self.context
         if data:
             params['json'] = data
