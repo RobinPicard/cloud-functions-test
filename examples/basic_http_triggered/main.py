@@ -6,4 +6,4 @@ def main(request):
     logging.info(value)
     if "a" not in value:
         return ("Error", 400)
-    return ({**value, "b": 2}, 200)
+    return ([{1, 2}], 200)
