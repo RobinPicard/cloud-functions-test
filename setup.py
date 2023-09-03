@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 
 name = "cloud-function-test"
-version = "0.0.5"
+version = "0.0.6"
 
 setup(
     name=name,
