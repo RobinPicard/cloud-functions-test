@@ -1,7 +1,7 @@
-import cloud_function_test
+import cloud_functions_test
 
 
-cloud_function_test.entrypoint = "hello"
+cloud_functions_test.entrypoint = "hello"
 
 
 class A:

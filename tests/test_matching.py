@@ -9,8 +9,8 @@ from typing import _SpecialForm
 
 import pytest
 
-from cloud_function_test.matching import is_instance_of_type
-from cloud_function_test.matching import partial_matching
+from cloud_functions_test.matching import is_instance_of_type
+from cloud_functions_test.matching import partial_matching
 
 
 def test_partial_matching():
@@ -32,6 +32,14 @@ def test_partial_matching():
     assert partial_matching([1, 2, 3], [1, 2, 3]) == True
     assert partial_matching([1, 2, 3], [1, 2]) == False
     assert partial_matching([1, 2, 3], [1, 2, 3, 4]) == False
+    # tuple with Ellipsis
+    assert partial_matching((1, 2, Ellipsis), (1, 2, 3, 4, 5)) == True
+    assert partial_matching((1, 2, Ellipsis), (1, 2)) == True
+    assert partial_matching((1, 2, Ellipsis), (2, 3, 4, 5)) == False
+    # tuple without Ellipsis
+    assert partial_matching((1, 2, 3), (1, 2, 3)) == True
+    assert partial_matching((1, 2, 3), (1, 2)) == False
+    assert partial_matching((1, 2, 3), (1, 2, 3, 4)) == False
     # dict with Ellipsis
     assert partial_matching({'a': 1, 'b': Ellipsis}, {'a': 1, 'b': 2}) == True
     assert partial_matching({'a': 1, Ellipsis: Ellipsis}, {'a': 1, 'b': 2}) == True
@@ -41,7 +49,15 @@ def test_partial_matching():
     assert partial_matching({'a': 1, 'b': 2}, {'a': 1}) == False
     assert partial_matching({'a': 1, 'b': 2}, {'a': 1, 'b': 3}) == False
     assert partial_matching({'a': 1, 'b': 2}, {'a': 1, 'b': 2, 'c': 3}) == False
-    # types
+    # set with Ellipsis
+    assert partial_matching({1, 2, Ellipsis}, {1, 2, 3, 4, 5}) == True
+    assert partial_matching({1, 2, Ellipsis}, {1, 2}) == True
+    assert partial_matching({1, 2, Ellipsis}, {2, 3, 4, 5}) == False
+    # set without Ellipsis
+    assert partial_matching({1, 2, 3}, {1, 2, 3}) == True
+    assert partial_matching({1, 2, 3}, {1, 2}) == False
+    assert partial_matching({1, 2, 3}, {1, 2, 3, 4}) == False
+#    # types
     assert partial_matching(int, 5) == True
     assert partial_matching(int, '5') == False
     assert partial_matching(str, 'hello') == True
@@ -51,6 +67,9 @@ def test_partial_matching():
     assert partial_matching(re.compile(r'^\d+$'), '123') == True
     assert partial_matching(Tuple[dict, List[int]], ({"a": 1}, [1, 2])) == True
     assert partial_matching(Tuple[dict, List[int]], ({"a": 1}, [1, "b"])) == False
+    assert partial_matching({"a": Tuple[List[int], Dict[str, Tuple[int, int]]]}, {"a": ([1, 2], {"a": (1, 2)})}) == True
+    assert partial_matching({"a": Tuple[dict, List[int]], "b": Any, Ellipsis:Ellipsis}, {"a": ({"a": 1}, [1, 2]), "b": 1, "c": 1}) == True
+    assert partial_matching({"a": Tuple[dict, List[int]], "b": 1, Ellipsis:Ellipsis}, {"a": ({"a": 1}, [1, "a"]), "b": Any, "c": 1}) == False
 
 
 def test_is_instance_of_type():

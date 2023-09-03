@@ -29,7 +29,7 @@ def import_user_classes(module_name: str) -> list:
             f"Could not find the module {module_name}\n"
             "Make sure your test classes are located in this module "
             "or modify the name of the module in which the package will look for test classes "
-            "by settings the value of cloud_function_test.module or by using the --module argument in the cli."
+            "by settings the value of cloud_functions_test.module or by using the --module argument in the cli."
         )
         raise ModuleNotFoundError(error_message)
     user_defined_classes = [

@@ -2,15 +2,15 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-name = "cloud-function-test"
+name = "cloud-functions-test"
 version = "0.0.6"
 
 setup(
     name=name,
     version=version,
-    packages=["cloud_function_test"],
+    packages=["cloud_functions_test"],
     package_data={
-        'cloud_function_test': ['test_classes/*'],
+        'cloud_functions_test': ['test_classes/*'],
     },
     license='apache-2.0',
     description="Test locally GCP Cloud Functions",
@@ -26,7 +26,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'cloud-function-test=cloud_function_test.cli:main',
+            'cloud-functions-test=cloud_functions_test.cli:main',
         ],
     },
     keywords=[

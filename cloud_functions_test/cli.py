@@ -5,7 +5,7 @@ from .main import main as entrypoint_main
 
 
 def main():
-    parser = argparse.ArgumentParser(description='cloud-function-test CLI')
+    parser = argparse.ArgumentParser(description='cloud-functions-test CLI')
     
     parser.add_argument('--module', '-m', type=str, help='Name of the module in which test classes are defined')
     parser.add_argument('--source', '-s', type=str, help='Path to the file in which your Cloud Function is defined')

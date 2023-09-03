@@ -1,7 +1,7 @@
-import cloud_function_test
+import cloud_functions_test
 
 
-cloud_function_test.port = 3000
+cloud_functions_test.port = 3000
 
 
 class A:

@@ -1,7 +1,7 @@
-import cloud_function_test
+import cloud_functions_test
 
 
-cloud_function_test.source = "foo.py"
+cloud_functions_test.source = "foo.py"
 
 
 class A:

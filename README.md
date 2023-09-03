@@ -1,4 +1,4 @@
-# cloud-function-test
+# cloud-functions-test
 
 Test GCP Cloud Functions locally
 
@@ -8,7 +8,7 @@ Test GCP Cloud Functions locally
 
 * [Basic Description](#basic-description)
 * [Installation](#installation)
-* [Using cloud-function-test](#using-cloud-function-test)
+* [Using cloud-functions-test](#using-cloud-functions-test)
     * [General Functioning](#general-functioning)
     * [Http-triggered Functions](#http-triggered-functions)
     * [Wildcards for Expected Content](#wildcards-for-expected-content)
@@ -58,7 +58,7 @@ class OopsUnintendedError:
     output = {"a": 1, "b": 2}
 ```
 
-You can then launch the tests by entering in your terminal `cloud-function-test`
+You can then launch the tests by entering in your terminal `cloud-functions-test`
 You would see the following output in your terminal (with colors):
 ```
 ================================================ Running 4 tests from the cf_tests module... =================================================
@@ -81,12 +81,12 @@ Unexpected output
 To install the latest version of the package:
 
 ```bash
-pip install cloud-function-test
+pip install cloud-functions-test
 ```
 
 <br>
 
-## Using cloud-function-test <a name="using-cloud-function-test"></a>
+## Using cloud-functions-test <a name="using-cloud-functions-test"></a>
 
 ### General Functioning <a name="general-functioning"></a>
 
@@ -163,12 +163,12 @@ There are 5 options you can modify for running your tests. Those can typically b
 
 * module: defaults to "cf_tests.py", name of the module in which your test classes are defined
 
-   * cli: `cloud-function-test --module <name_test_module>`
+   * cli: `cloud-functions-test --module <name_test_module>`
 
 
 * source: defaults to "main.py", path to the file in which your Cloud Function is defined
 
-   * cli: `cloud-function-test --source <path_to_file>`
+   * cli: `cloud-functions-test --source <path_to_file>`
    * in test module:
    ```
    import cloud_function_framework
@@ -177,7 +177,7 @@ There are 5 options you can modify for running your tests. Those can typically b
 
 * entrypoint: defaults to "main", name of the Cloud Function entrypoint in the file in which your Cloud Function is defined
 
-   * cli: `cloud-function-test --entrypoint <entrypoint>`
+   * cli: `cloud-functions-test --entrypoint <entrypoint>`
    * in test module:
    ```
    import cloud_function_framework
@@ -186,7 +186,7 @@ There are 5 options you can modify for running your tests. Those can typically b
 
 * env: defaults to ".env", path to the file in which your environment variables are defined (nothing happens if the file does not exist)
 
-   * cli: `cloud-function-test --env <env_file_path>`
+   * cli: `cloud-functions-test --env <env_file_path>`
    * in test module:
    ```
    import cloud_function_framework
@@ -212,7 +212,7 @@ There are 5 options you can modify for running your tests. Those can typically b
 
 * port: defaults to 8080, port of localhost that will be used by functions-framework to launch the local server receiving the requests that will trigger the Cloud Functions
 
-   * cli: `cloud-function-test --port <port>`
+   * cli: `cloud-functions-test --port <port>`
    * in test module:
    ```
    import cloud_function_framework
