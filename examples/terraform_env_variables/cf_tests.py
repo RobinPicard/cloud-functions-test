@@ -1,7 +1,7 @@
-import cloud_function_test
+import cloud_functions_test
 
 
-cloud_function_test.env = 'terraform_file.tf'
+cloud_functions_test.env = 'terraform_file.tf'
 
 
 class A:

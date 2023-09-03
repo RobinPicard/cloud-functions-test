@@ -1,9 +1,9 @@
 import re
 from typing import Any
+from typing import List
 from typing import Tuple
 from typing import Type
 from typing import Union
-from typing import List
 from typing import _SpecialForm
 
 
@@ -35,16 +35,14 @@ def partial_matching(expected: Any, actual: Any) -> bool:
     elif type(expected) != type(actual):
         return False
 
-    # in case of a list
-    elif isinstance(expected, list):
+    # in case of a list or tuple
+    elif isinstance(expected, (list, tuple)):
         if Ellipsis in expected:
-            expected = {item for item in expected if item != Ellipsis}
-            for item in expected:
-                return any(partial_matching(item, element) for element in actual)
-        else:
-            if len(expected) != len(actual):
-                return False
-            return all(partial_matching(a, b) for a, b in zip(expected, actual))
+            expected = [item for item in expected if item != Ellipsis]
+            actual = actual[:len(expected)]
+        if len(expected) != len(actual):
+            return False
+        return all(partial_matching(e, a) for e, a in zip(expected, actual))
 
     # in case of a dict
     elif isinstance(expected, dict):
@@ -53,9 +51,19 @@ def partial_matching(expected: Any, actual: Any) -> bool:
         else:
             return all(partial_matching(expected[key], actual[key]) for key in expected if not expected[key] == Ellipsis)
 
+    # in case of a set
+    elif isinstance(expected, set):
+        if Ellipsis in expected:
+            expected = {item for item in expected if item != Ellipsis}
+        elif len(expected) != len(actual):
+            return False
+        return all(
+            any(partial_matching(e, a) for a in actual)
+            for e in expected
+        )
+
     # for all other types
     return expected == actual
-
 
 
 def is_instance_of_type(value: Any, type_hint: Any) -> bool:
@@ -111,5 +119,9 @@ def is_instance_of_type(value: Any, type_hint: Any) -> bool:
             for element, element_type in zip(value, element_types)
         )
 
-    # cases not treated
+    # in case type_hint = Set
+    if hasattr(type_hint, '__origin__') and type_hint.__origin__ is set:
+        return True
+
+    # cases not covered
     return False

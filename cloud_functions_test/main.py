@@ -18,7 +18,7 @@ from .test_classes.http_test import HttpFunctionTest
 
 LOCAL_URL_BASE = 'http://localhost'
 TEST_MODULE = "cf_tests"
-EVENT_FUNC_ENTRYPOINT = "cloud_function_test_entrypoint"
+EVENT_FUNC_ENTRYPOINT = "cloud_functions_test_entrypoint"
 
 
 def main(cli_test_module: str, cli_source: str, cli_entrypoint: str, cli_env: str, cli_port: int) -> None:
