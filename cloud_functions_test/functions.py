@@ -12,11 +12,11 @@ from requests import ConnectionError
 from .exceptions import DifferentClassTypesError
 from .exceptions import MissingTestClassError
 from .exceptions import PortUnavailableError
+from .logger import custom_logger
 from .test_classes.base_test import BaseFunctionTest
 from .test_classes.event_test import EventFunctionTest
 from .test_classes.http_test import HttpFunctionTest
 from .utils import log_reader
-from .utils import print_centered_text
 
 
 def import_user_classes(module_name: str) -> list:
@@ -131,14 +131,14 @@ def run_tests(process: object, local_url: str, tests: Type[BaseFunctionTest]) ->
 
 
 def display_detailed_results(failures: list, successes: list) -> None:
-    """Given lists of failures and successes, print their results"""
-    print(f"*** {len(successes)} tests passed and {len(failures)} failed ***")
+    """Given lists of failures and successes, log their results"""
+    custom_logger.log_colored([f"*** {len(successes)} tests passed and {len(failures)} failed ***"])
     if failures:
-        print_centered_text("FAILED")
+        custom_logger.log_centered("FAILED")
         for result in failures:
-            print(result)
+            custom_logger.log_colored(result)
     if any(result for result in successes):
-        print_centered_text("PASSED")
+        custom_logger.log_centered("PASSED")
         for result in successes:
             if result:
-                print(result)
+                custom_logger.log_colored(result)

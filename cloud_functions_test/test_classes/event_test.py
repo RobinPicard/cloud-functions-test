@@ -2,9 +2,9 @@ import json
 from typing import Any, List, Union, Tuple, Type
 
 import requests
-from termcolor import colored, cprint
 
 from .base_test import BaseFunctionTest
+from ..logger import custom_logger
 from ..matching import partial_matching
 
 
@@ -47,7 +47,7 @@ class EventFunctionTest(BaseFunctionTest):
     def check_response_validity(self, error_logs: str, standard_logs: str) -> Tuple[str, str]:
         """
         Check whether the function created error logs and compare it to the value of self.error
-        Print out whether the test passed or failed and returns the detailled logs in case of failure.
+        Log whether the test passed or failed and returns the detailled logs in case of failure.
         """
         response_time = self.response.elapsed.total_seconds()
         status = "passed"
@@ -58,18 +58,18 @@ class EventFunctionTest(BaseFunctionTest):
             or (error_logs and not self.error)
         ):
             status = "failed"
-            print(f"test {self.name} in {response_time}s: ", colored("FAILED", 'red'))
-            display_message.append(colored(f"test {self.name}", "cyan"))
+            custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("FAILED", "RED")])
+            display_message.append([(f"test {self.name}", "CYAN")])
             if standard_logs:
-                display_message.append(f"{standard_logs}")
+                display_message.append([(f"{standard_logs}")])
             if error_logs:
-                display_message.append(f"Function crashed")
-                display_message.append(f"{error_logs}")
+                display_message.append([(f"Function crashed")])
+                display_message.append([(f"{error_logs}")])
             else:
-                display_message.append(f"Function did not crash while an error was expected")
+                display_message.append([(f"Function did not crash while an error was expected")])
         else:
-            print(f"test {self.name} in {response_time}s: ", colored("PASSED", 'green'))
+            custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("PASSED", "GREEN")])
             if self.display_logs and standard_logs:
-                display_message.append(colored(f"test {self.name}", "cyan"))
-                display_message.append(f"{standard_logs}")
+                display_message.append([(f"test {self.name}", "CYAN")])
+                display_message.append([(f"{standard_logs}")])
         return (status, "\n".join(display_message))

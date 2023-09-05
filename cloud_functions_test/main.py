@@ -10,7 +10,7 @@ from .functions import display_detailed_results
 from .functions import import_user_classes
 from .functions import run_tests
 from .functions import start_server
-from .utils import print_centered_text
+from .logger import custom_logger
 from .utils import set_fd_nonblocking
 from .test_classes.event_test import EventFunctionTest
 from .test_classes.http_test import HttpFunctionTest
@@ -43,7 +43,7 @@ def main(cli_test_module: str, cli_source: str, cli_entrypoint: str, cli_env: st
 
     # create BaseFunctionTest objects from the user-defined classes
     tests, test_type = create_tests(user_defined_classes)
-    print_centered_text(f"Running {len(tests)} tests from the {test_module} module...")
+    custom_logger.log_centered(f"Running {len(tests)} tests from the {test_module} module...")
 
     # if it's for an event function, create temp file to turn the http request into an event/context pair
     if test_type == EventFunctionTest:

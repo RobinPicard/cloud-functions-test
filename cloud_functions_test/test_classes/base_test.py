@@ -94,6 +94,6 @@ class BaseFunctionTest:
     def check_response_validity(self, error_logs: str, standard_logs: str) -> Tuple[str, str]:
         """
         Check the validity of the request's response compared to the expected values.
-        Return the status of the test and the detailed message that should be printed out
+        Return the status of the test and the detailed message that should be logged
         """
         pass
