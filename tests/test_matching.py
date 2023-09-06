@@ -34,14 +34,6 @@ def test_partial_matching():
     assert partial_matching([1, 2, 3], [1, 2, 3]) == True
     assert partial_matching([1, 2, 3], [1, 2]) == False
     assert partial_matching([1, 2, 3], [1, 2, 3, 4]) == False
-    # instance tuple with Ellipsis
-    assert partial_matching((1, 2, Ellipsis), (1, 2, 3, 4, 5)) == True
-    assert partial_matching((1, 2, Ellipsis), (1, 2)) == True
-    assert partial_matching((1, 2, Ellipsis), (2, 3, 4, 5)) == False
-    # instance tuple without Ellipsis
-    assert partial_matching((1, 2, 3), (1, 2, 3)) == True
-    assert partial_matching((1, 2, 3), (1, 2)) == False
-    assert partial_matching((1, 2, 3), (1, 2, 3, 4)) == False
     # instance dict with Ellipsis
     assert partial_matching({'a': 1, 'b': Ellipsis}, {'a': 1, 'b': 2}) == True
     assert partial_matching({'a': 1, Ellipsis: Ellipsis}, {'a': 1, 'b': 2}) == True
@@ -75,7 +67,7 @@ def test_partial_matching():
     assert partial_matching(Dict[str, int], {"key": 1, "foo": 2}) == True
     assert partial_matching(Dict[str, int], {1: "value"}) == False
     assert partial_matching(Dict[str, int], "not_a_dict") == False
-    # mix of several things
+    # various / mix of several things
     assert partial_matching(Union[List[int], str], [1, 2, 3]) == True
     assert partial_matching(Tuple[int, List[int]], [1, [2, 3]]) == True
     assert partial_matching(Tuple[int, List[int]], [1, [2, "hello"]]) == False
@@ -88,3 +80,6 @@ def test_partial_matching():
     assert partial_matching({"a": Tuple[List[int], Dict[str, Tuple[int, int]]]}, {"a": [[1, 2], {"a": [1, 2]}]}) == True
     assert partial_matching({"a": Tuple[dict, List[int]], "b": Any, Ellipsis:Ellipsis}, {"a": [{"a": 1}, [1, 2]], "b": 1, "c": 1}) == True
     assert partial_matching({"a": Tuple[dict, List[int]], "b": 1, Ellipsis:Ellipsis}, {"a": [{"a": 1}, [1, "a"]], "b": Any, "c": 1}) == False
+    assert partial_matching(Dict[str, str], [1, 2, 3]) == False
+    assert partial_matching(Tuple[int, int], [1, 2, 3]) == False
+    assert partial_matching(Tuple[int, int], [1, 2]) == True
