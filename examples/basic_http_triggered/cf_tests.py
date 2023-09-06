@@ -6,6 +6,7 @@ class CorrectInput:
     headers = {'Content-Type': 'application/json'}
     status_code = 200
     output = {"a": 1, "b": 2}
+    display_logs = True
 
 class IncorrectInput:
     data = {1: 2}

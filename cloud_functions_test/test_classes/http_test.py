@@ -3,12 +3,10 @@ import re
 from typing import Any, List, Union, Tuple, Type
 
 import requests
-from termcolor import colored, cprint
 
 from .base_test import BaseFunctionTest
+from ..logger import custom_logger
 from ..matching import partial_matching
-
-
 
 
 class HttpFunctionTest(BaseFunctionTest):
@@ -49,8 +47,8 @@ class HttpFunctionTest(BaseFunctionTest):
     def check_response_validity(self, error_logs: str, standard_logs: str) -> Tuple[str, str]:
         """
         Check the validity of the request's response compared to the expected values.
-        Print out whether the test passed or failed and returns the status and the detailled
-        logs in case of failure or if the user asked for the output to be printed out.
+        Log whether the test passed or failed and returns the status and the detailled
+        logs in case of failure or if the user asked for the output to be logged.
         """
         response_status = self.response.status_code
         response_output = self.extract_response_output(self.response)
@@ -66,34 +64,34 @@ class HttpFunctionTest(BaseFunctionTest):
             or (self.output is not None and not partial_matching(self.output, response_output))
         ):
             status = "failed"
-            print(f"test {self.name} in {response_time}s: ", colored("FAILED", 'red'))
-            display_message.append(colored(f"test {self.name}", "cyan"))
-            if standard_logs: display_message.append(f"{standard_logs}")
+            custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("FAILED", "RED")])
+            display_message.append((f"test {self.name}", "CYAN"))
+            if standard_logs: display_message.append(standard_logs)
         else:
-            print(f"test {self.name} in {response_time}s: ", colored("PASSED", 'green'))         
+            custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("PASSED", "GREEN")])   
 
         # add some detailled logs for different types of failure
         if (response_output == Exception) and not self.error:
-            display_message.append(f"Function crashed")
-            display_message.append(f"{error_logs}")
+            display_message.append("Function crashed")
+            display_message.append(error_logs)
         elif (response_output != Exception) and self.error:
-            display_message.append(f"Function did not crash while an error was expected")
+            display_message.append("Function did not crash while an error was expected")
             display_message.append(f"- received: {response_status}, {response_output}")
         else:
             if self.status_code is not None and self.status_code != response_status:
-                display_message.append(f"Unexpected status code")
+                display_message.append("Unexpected status code")
                 display_message.append(f"- expected: {self.status_code}")
                 display_message.append(f"- received: {response_status}")
             if self.output is not None and not partial_matching(self.output, response_output):
-                display_message.append(f"Unexpected output")
+                display_message.append("Unexpected output")
                 display_message.append(f"- expected: {self.output}")
                 display_message.append(f"- received: {response_output}")
 
         # add the output to the logs in case of success if display_logs == True
         if status == "passed" and self.display_logs:
-            display_message.append(colored(f"test {self.name}", "cyan"))
+            display_message.append((f"test {self.name}", "CYAN"))
             if standard_logs: display_message.append(f"{standard_logs}")
             display_message.append("Output:")
             display_message.append(f"{response_output}, {response_status}")           
 
-        return (status, "\n".join(display_message))      
+        return (status, display_message)      
