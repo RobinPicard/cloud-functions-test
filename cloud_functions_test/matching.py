@@ -20,13 +20,6 @@ def partial_matching(expected: Any, actual: Any) -> bool:
     if isinstance(expected, tuple):
         expected = list(expected)
 
-    # basic types
-    try:
-        if isinstance(actual, expected):
-            return True
-    except TypeError:
-        pass
-
     # typing.Any
     if isinstance(expected, _SpecialForm) and expected._name == "Any":
         return True
@@ -70,7 +63,9 @@ def partial_matching(expected: Any, actual: Any) -> bool:
         return bool(expected.match(actual))
 
     # instance list
-    elif isinstance(expected, list):
+    if isinstance(expected, list):
+        if not isinstance(actual, list):
+            return False
         if Ellipsis in expected:
             expected = [item for item in expected if item != Ellipsis]
             actual = actual[:len(expected)]
@@ -79,11 +74,20 @@ def partial_matching(expected: Any, actual: Any) -> bool:
         return all(partial_matching(e, a) for e, a in zip(expected, actual))
 
     # instance dict
-    elif isinstance(expected, dict):
+    if isinstance(expected, dict):
+        if not isinstance(actual, dict):
+            return False
         if not Ellipsis in expected and not expected.keys() == actual.keys():
             return False
         else:
             return all(partial_matching(expected[key], actual[key]) for key in expected if not expected[key] == Ellipsis)
 
-    # for all other types
+    # other basic types
+    try:
+        if isinstance(actual, expected):
+            return True
+    except TypeError:
+        pass
+
+    # all remaining cases
     return expected == actual
