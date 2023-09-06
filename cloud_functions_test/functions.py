@@ -132,13 +132,14 @@ def run_tests(process: object, local_url: str, tests: Type[BaseFunctionTest]) ->
 
 def display_detailed_results(failures: list, successes: list) -> None:
     """Given lists of failures and successes, log their results"""
-    custom_logger.log_colored([f"*** {len(successes)} tests passed and {len(failures)} failed ***"])
+    custom_logger.log_colored(f"*** {len(successes)} tests passed and {len(failures)} failed ***")
     if failures:
         custom_logger.log_centered("FAILED")
         for result in failures:
-            custom_logger.log_colored(result)
+            for item in result:
+                custom_logger.log_colored(item)
     if any(result for result in successes):
         custom_logger.log_centered("PASSED")
         for result in successes:
-            if result:
-                custom_logger.log_colored(result)
+            for item in result:
+                custom_logger.log_colored(item)

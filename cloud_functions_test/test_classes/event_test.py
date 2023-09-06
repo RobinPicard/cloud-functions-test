@@ -59,17 +59,17 @@ class EventFunctionTest(BaseFunctionTest):
         ):
             status = "failed"
             custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("FAILED", "RED")])
-            display_message.append([(f"test {self.name}", "CYAN")])
+            display_message.append((f"test {self.name}", "CYAN"))
             if standard_logs:
-                display_message.append([(f"{standard_logs}")])
+                display_message.append(standard_logs)
             if error_logs:
-                display_message.append([(f"Function crashed")])
-                display_message.append([(f"{error_logs}")])
+                display_message.append("Function crashed")
+                display_message.append(error_logs)
             else:
-                display_message.append([(f"Function did not crash while an error was expected")])
+                display_message.append("Function did not crash while an error was expected")
         else:
             custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("PASSED", "GREEN")])
             if self.display_logs and standard_logs:
-                display_message.append([(f"test {self.name}", "CYAN")])
-                display_message.append([(f"{standard_logs}")])
-        return (status, "\n".join(display_message))
+                display_message.append((f"test {self.name}", "CYAN"))
+                display_message.append(f"{standard_logs}")
+        return (status, display_message)

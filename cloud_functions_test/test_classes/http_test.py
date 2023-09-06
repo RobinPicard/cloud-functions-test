@@ -65,33 +65,33 @@ class HttpFunctionTest(BaseFunctionTest):
         ):
             status = "failed"
             custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("FAILED", "RED")])
-            display_message.append([(f"test {self.name}", "CYAN")])
-            if standard_logs: display_message.append([(f"{standard_logs}")])
+            display_message.append((f"test {self.name}", "CYAN"))
+            if standard_logs: display_message.append(standard_logs)
         else:
             custom_logger.log_colored([(f"test {self.name} in {response_time}s: ", "DEFAULT"), ("PASSED", "GREEN")])   
 
         # add some detailled logs for different types of failure
         if (response_output == Exception) and not self.error:
-            display_message.append([(f"Function crashed")])
-            display_message.append([(f"{error_logs}")])
+            display_message.append("Function crashed")
+            display_message.append(error_logs)
         elif (response_output != Exception) and self.error:
-            display_message.append([(f"Function did not crash while an error was expected")])
-            display_message.append([(f"- received: {response_status}, {response_output}")])
+            display_message.append("Function did not crash while an error was expected")
+            display_message.append(f"- received: {response_status}, {response_output}")
         else:
             if self.status_code is not None and self.status_code != response_status:
-                display_message.append([(f"Unexpected status code")])
-                display_message.append([(f"- expected: {self.status_code}")])
-                display_message.append([(f"- received: {response_status}")])
+                display_message.append("Unexpected status code")
+                display_message.append(f"- expected: {self.status_code}")
+                display_message.append(f"- received: {response_status}")
             if self.output is not None and not partial_matching(self.output, response_output):
-                display_message.append([(f"Unexpected output")])
-                display_message.append([(f"- expected: {self.output}")])
-                display_message.append([(f"- received: {response_output}")])
+                display_message.append("Unexpected output")
+                display_message.append(f"- expected: {self.output}")
+                display_message.append(f"- received: {response_output}")
 
         # add the output to the logs in case of success if display_logs == True
         if status == "passed" and self.display_logs:
-            display_message.append([(f"test {self.name}", "CYAN")])
-            if standard_logs: display_message.append([(f"{standard_logs}")])
-            display_message.append([("Output:")])
-            display_message.append([(f"{response_output}, {response_status}")])           
+            display_message.append((f"test {self.name}", "CYAN"))
+            if standard_logs: display_message.append(f"{standard_logs}")
+            display_message.append("Output:")
+            display_message.append(f"{response_output}, {response_status}")           
 
-        return (status, "\n".join(display_message))      
+        return (status, display_message)      
